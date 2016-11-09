@@ -1,0 +1,7 @@
+node_modules/
+coverage/
+.nyc_output/
+*.js
+.idea/
+!webpack.config.js
+dist/

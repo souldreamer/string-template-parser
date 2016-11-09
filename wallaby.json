@@ -1,0 +1,14 @@
+{
+	"files": [
+		"./**/*.ts",
+		"!./**/*.spec.ts",
+		"!./node_modules/**/*.*"
+	],
+	"tests": [
+		"tests/**/*.spec.ts"
+	],
+	"env": {
+		"type": "node"
+	},
+	"testFramework": "ava"
+}
