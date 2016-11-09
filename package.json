@@ -2,6 +2,7 @@
 	"name": "string-template-parser",
 	"version": "1.0.0-alpha",
 	"description": "Parsing & evaluating utilities for string templates",
+	"repository": "https://github.com/souldreamer/string-template-parser.git",
 	"main": "dist/index.js",
 	"author": "Ionut Costica <ionut.costica@gmail.com>",
 	"license": "MIT",
