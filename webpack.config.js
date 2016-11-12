@@ -1,10 +1,17 @@
-var webpack = require('webpack'),
-	path = require('path'),
-	yargs = require('yargs');
+var webpack = require('webpack');
+var path = require('path');
+var yargs = require('yargs');
+var dts = require('dts-bundle');
+var deleteEmpty = require('delete-empty');
+var os = require('os');
+var nodeExternals = require('webpack-node-externals');
+var del = require('del');
 
-var libraryName = 'string-template-parser',
-	plugins = [],
-	outputFile;
+var libraryName = 'string-template-parser';
+var plugins = [
+	new webpack.ProgressPlugin(webpackStartEndHandler)
+];
+var outputFile;
 
 if (yargs.argv.p) {
 	plugins.push(new webpack.optimize.UglifyJsPlugin({ minimize: true }));
@@ -15,7 +22,7 @@ if (yargs.argv.p) {
 
 var config = {
 	entry: [
-		__dirname + '/src/index.ts'
+		path.join(__dirname, '/src/index.ts')
 	],
 	devtool: 'source-map',
 	output: {
@@ -26,24 +33,62 @@ var config = {
 		umdNamedDefine: true
 	},
 	module: {
-//		preLoaders: [
-//			{ test: /\.ts$/, loader: 'tslint', exclude: /node_modules/ }
-//      ],
 		loaders: [
-			{ test: /\.ts$/, loader: 'ts', exclude: /node_modules/ }
+			{ test: /\.ts$/, loader: 'ts', exclude: [/node_modules/, /dist/, /tests/] }
 		]
 	},
 	resolve: {
 		root: path.resolve('./src'),
-		extensions: [ '', '.ts' ]
+		extensions: [ '', '.ts', '!.spec.ts' ]
 	},
-	plugins: plugins//,
+	plugins: plugins,
+	externals: [nodeExternals()],
 
-	// Individual Plugin Options
-//	tslint: {
-//		emitErrors: true,
-//		failOnHint: true
-//	}
+	ts: {
+		compilerOptions: {
+			declaration: true
+		}
+	}
 };
 
 module.exports = config;
+
+function webpackStartEndHandler(percentage, message) {
+	if (percentage === 0) {
+		// start
+		del.sync('dist');
+	}
+	if (percentage === 1) {
+		// end
+		console.log("Building .d.ts bundle");
+		dts.bundle(dtsBundleOptions);
+		deleteEmpty(dtsBundleOptions.baseDir, function(err, deletedFile) {
+			if (err) {
+				console.error('Couldn\'t delete: ' + err);
+				throw err;
+			}
+			console.log('Deleted: ' + deletedFile);
+		});
+
+		// currently ts-loader emits declarations for ./tests too for some reason
+		del.sync('dist/tests');
+	}
+}
+
+var dtsBundleOptions = {
+	name: libraryName,
+	main: 'dist/src/index.d.ts',
+	baseDir: 'dist/src',
+	out: '../index.d.ts',
+	externals: false,
+	referenceExternals: false,
+	removeSource: true,
+	newline: os.EOL,
+	indent: '   ',
+	prefix: '',
+	separator: '/',
+	verbose: false,
+	emitOnIncludedFileNotFound: false,
+	emitOnNoIncludedFileNotFound: false,
+	outputAsModuleFolder: false
+};

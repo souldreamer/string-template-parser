@@ -13,7 +13,7 @@ export interface ParsedString {
 	variables: Variable[];
 }
 
-enum ParseState {
+const enum ParseState {
 	Literal,
 	Variable,
 	Pipe,
@@ -31,8 +31,7 @@ export function parseStringTemplateGenerator({
 	return function parseStringTemplate(input: string): ParsedString {
 		let remainingString = input;
 		let parsedString: ParsedString = {literals: [], variables: []};
-		let parseState = ParseState.Literal;
-		let currentPosition = 0;
+		let parseState = <ParseState>ParseState.Literal;
 		let currentLiteral = '';
 		let currentVariable: Variable = {name: '', pipes: []};
 		let currentPipe: Pipe = {name: '', parameters: []};
@@ -109,7 +108,6 @@ export function parseStringTemplateGenerator({
 
 		function advance(length: number = 1) {
 			remainingString = remainingString.substr(length);
-			if (parseState === ParseState.Literal) currentPosition += length;
 		}
 		function skipMatch(regex: RegExp = /^/) {
 			advance((<RegExpMatchArray>remainingString.match(regex))[0].length);

@@ -13,14 +13,14 @@
 		"declaration": false,
 		"lib": ["es6", "es5", "dom"],
 		"typeRoots": [
-			"./node_modules/@types",
-			"./@types"
+			"./node_modules/@types"
 		],
 		"types": [
 			"node"
 		]
 	},
 	"exclude": [
-		"node_modules/**/*"
+		"node_modules/**/*",
+		"dist/**/*"
 	]
 }
