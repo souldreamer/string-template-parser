@@ -36,7 +36,7 @@ parseStringTemplate('a ${v1|p:param} b ${v2} c');
 import { parseStringTemplateGenerator } from 'string-template-parser';
 const myParseStringTemplate = parseStringTemplateGenerator({VARIABLE_START: /^\{\{/, VARIABLE_END: /^\}\}/});
 
-myParseStringTemplate('a {{v1|p:param} b {{v2}} c');
+myParseStringTemplate('a {{v1|p:param}} b {{v2}} c');
 /* returns:
         {
           literals: ['a ', ' b ', ' c'],
