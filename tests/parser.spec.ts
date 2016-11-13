@@ -1,9 +1,21 @@
 import { test } from 'ava';
-import { ParsedString, parseStringTemplate } from '../src/string-parser';
+import { ParsedString, parseStringTemplate, parseStringTemplateGenerator } from '../src/parser';
+
+const parseAngularStringTemplate = parseStringTemplateGenerator({
+	VARIABLE_START: /^(\{\{\s*)/,
+	VARIABLE_END: /^\s*}}/
+});
 
 function testStringParsing(testName: string, testString: string, expected: ParsedString) {
 	test(testName, t => {
 		const testResult = parseStringTemplate(testString);
+		t.deepEqual(testResult, expected);
+	});
+}
+
+function testAngularStringParsing(testName: string, testString: string, expected: ParsedString) {
+	test(testName, t => {
+		const testResult = parseAngularStringTemplate(testString);
 		t.deepEqual(testResult, expected);
 	});
 }
@@ -105,8 +117,29 @@ testStringParsing('empty string in variable', '${""}',
 	{literals: ['', ''], variables: [{name: '', pipes: []}]});
 testStringParsing('string variable ending in an escaped backslash', '${"\\\\"}',
 	{literals: ['', ''], variables: [{name: '\\', pipes: []}]});
-testStringParsing('complex example #1',
+testStringParsing('complex example',
 	'${ var1 | pipe1 : param1 : param2 | pipe2: paramA : paramB } bla ${ va"r"\\|2 | p"i|p"e\\:test : "p"ara"m"\\:X }',
+	{literals: ['', ' bla ', ''], variables: [
+		{name: 'var1', pipes: [
+			{name: 'pipe1', parameters: ['param1', 'param2']},
+			{name: 'pipe2', parameters: ['paramA', 'paramB']}]},
+		{name: 'var|2', pipes: [
+			{name: 'pi|pe:test', parameters: ['param:X']}]}]});
+
+testAngularStringParsing('angular string without variables', 'string',
+	{literals: ['string'], variables: []});
+testAngularStringParsing('angular string without variables, but with default variable start/end', 'string ${var}',
+	{literals: ['string ${var}'], variables: []});
+testAngularStringParsing('angular string without variables (escaped)', 'string \\{{not-a-var}}',
+	{literals: ['string {{not-a-var}}'], variables: []});
+testAngularStringParsing('angular string with variable', 'string {{var}}',
+	{literals: ['string ', ''], variables: [{name: 'var', pipes: []}]});
+testAngularStringParsing('angular string with variable & pipe', 'string {{var|pipe}}',
+	{literals: ['string ', ''], variables: [{name: 'var', pipes: [{name: 'pipe', parameters: []}]}]});
+testAngularStringParsing('angular string with variable, pipe & pipe parameter', 'string {{var|pipe:param}}',
+	{literals: ['string ', ''], variables: [{name: 'var', pipes: [{name: 'pipe', parameters: ['param']}]}]});
+testAngularStringParsing('angular complex example',
+	'{{ var1 | pipe1 : param1 : param2 | pipe2: paramA : paramB }} bla {{ va"r"\\|2 | p"i|p"e\\:test : "p"ara"m"\\:X }}',
 	{literals: ['', ' bla ', ''], variables: [
 		{name: 'var1', pipes: [
 			{name: 'pipe1', parameters: ['param1', 'param2']},

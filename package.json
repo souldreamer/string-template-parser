@@ -1,6 +1,6 @@
 {
 	"name": "string-template-parser",
-	"version": "1.0.0-alpha.5",
+	"version": "1.0.0-rc.0",
 	"description": "Parsing & evaluating utilities for string templates",
 	"repository": "https://github.com/souldreamer/string-template-parser.git",
 	"main": "./dist/string-template-parser.js",

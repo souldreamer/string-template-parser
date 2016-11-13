@@ -12,16 +12,13 @@ var plugins = [
 	new webpack.ProgressPlugin(webpackStartEndHandler)
 ];
 var outputFile;
-var cleanInstall = false;
+var cleanInstall = yargs.argv.clean && true || false;
 
 if (yargs.argv.p) {
 	plugins.push(new webpack.optimize.UglifyJsPlugin({ minimize: true }));
 	outputFile = libraryName + '.min.js';
 } else {
 	outputFile = libraryName + '.js';
-}
-if (yargs.argv.clean) {
-	cleanInstall = true;
 }
 
 var config = {
@@ -66,7 +63,8 @@ function webpackStartEndHandler(percentage, message) {
 		// end
 		console.log("Building .d.ts bundle");
 		dts.bundle(dtsBundleOptions);
-		deleteEmpty(dtsBundleOptions.baseDir, function(err, deletedFile) {
+		console.log('Cleaning intermediate .d.ts files');
+		deleteEmpty(dtsBundleOptions.baseDir, function (err, deletedFile) {
 			if (err) {
 				console.error('Couldn\'t delete: ' + err);
 				throw err;

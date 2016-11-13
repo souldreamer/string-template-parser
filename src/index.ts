@@ -1,1 +1,2 @@
-export * from './string-parser';
+export * from './parser';
+export * from './evaluator';
