@@ -5,7 +5,7 @@ String template parsing utilities.
 `parseStringTemplate` uses the default configuration (i.e. variable
 start is marked by `${` and variable end by `}`, the escape character
 is ` \ `, a pipe is started with `|` and a pipe parameter starts after
-a `:`, e.g. `'string ${var | pipe : parameter}`).
+a `:`, e.g. `'string ${var | pipe : parameter}'`).
 
 `parseStringTemplateGenerator` returns a string parsing function
 that uses the supplied expressions from the configuration parameter

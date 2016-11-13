@@ -12,12 +12,16 @@ var plugins = [
 	new webpack.ProgressPlugin(webpackStartEndHandler)
 ];
 var outputFile;
+var cleanInstall = false;
 
 if (yargs.argv.p) {
 	plugins.push(new webpack.optimize.UglifyJsPlugin({ minimize: true }));
 	outputFile = libraryName + '.min.js';
 } else {
 	outputFile = libraryName + '.js';
+}
+if (yargs.argv.clean) {
+	cleanInstall = true;
 }
 
 var config = {
@@ -56,7 +60,7 @@ module.exports = config;
 function webpackStartEndHandler(percentage, message) {
 	if (percentage === 0) {
 		// start
-		del.sync('dist');
+		if (cleanInstall) del.sync('dist');
 	}
 	if (percentage === 1) {
 		// end
@@ -84,7 +88,7 @@ var dtsBundleOptions = {
 	referenceExternals: false,
 	removeSource: true,
 	newline: os.EOL,
-	indent: '   ',
+	indent: '\t',
 	prefix: '',
 	separator: '/',
 	verbose: false,
