@@ -20,14 +20,36 @@ const enum ParseState {
 	PipeParameter
 }
 
+export const DEFAULT_QUOTED_STRING_REGEX = /^('((?:[^'\\]|\\.)*)'|'((?:[^'\\]|\\.)*)$|"((?:[^"\\]|\\.)*)"|"((?:[^"\\]|\\.)*)$)/;
+
 export function parseStringTemplateGenerator({
 	ESCAPE = /^\\/,
-	VARIABLE_START = /^\$\{\s*/,
+	VARIABLE_START = /^\${\s*/,
 	VARIABLE_END = /^\s*}/,
 	PIPE_START = /^\s*\|\s*/,
 	PIPE_PARAMETER_START = /^\s*:\s*/,
-	QUOTED_STRING = /^('((?:[^'\\]|\\.)*)'|'((?:[^'\\]|\\.)*)$|"((?:[^"\\]|\\.)*)"|"((?:[^"\\]|\\.)*)$)/
+	QUOTED_STRING = DEFAULT_QUOTED_STRING_REGEX,
+	QUOTED_STRING_TEST = null,
+	QUOTED_STRING_GET_AND_ADVANCE = null,
+	QUOTED_STRING_IN_PARAMETER_TEST = null,
+	QUOTED_STRING_IN_PARAMETER_GET_AND_ADVANCE = null
+}: {
+	ESCAPE?: RegExp,
+	VARIABLE_START?: RegExp,
+	VARIABLE_END?: RegExp,
+	PIPE_START?: RegExp,
+	PIPE_PARAMETER_START?: RegExp,
+	QUOTED_STRING?: RegExp,
+	QUOTED_STRING_TEST?: (remainingString: string) => boolean | null,
+	QUOTED_STRING_GET_AND_ADVANCE?: (remainingString: string, advance: (length: number) => void) => string | null,
+	QUOTED_STRING_IN_PARAMETER_TEST?: (remainingString: string) => boolean | null,
+	QUOTED_STRING_IN_PARAMETER_GET_AND_ADVANCE?: (remainingString: string, advance: (length: number) => void) => string | null
 } = {}) {
+	const quotedStringTest = QUOTED_STRING_TEST || ((remainingString: string) => QUOTED_STRING.test(remainingString));
+	const quotedStringGetAndAdvance = QUOTED_STRING_GET_AND_ADVANCE || getQuotedStringAndAdvanceForRegex(QUOTED_STRING);
+	const quotedStringInParameterTest = QUOTED_STRING_IN_PARAMETER_TEST || ((remainingString: string) => QUOTED_STRING.test(remainingString));
+	const quotedStringInParameterGetAndAdvance = QUOTED_STRING_IN_PARAMETER_GET_AND_ADVANCE || getQuotedStringAndAdvanceForRegex(QUOTED_STRING);
+	
 	return function parseStringTemplate(input: string): ParsedString {
 		let remainingString = input;
 		let parsedString: ParsedString = {literals: [], variables: []};
@@ -64,8 +86,8 @@ export function parseStringTemplateGenerator({
 					continue;
 				}
 				if (testVariableEnd() || testPipeStart()) continue;
-				if (QUOTED_STRING.test(remainingString)) {
-					currentVariable.name += getQuotedString();
+				if (quotedStringTest(remainingString)) {
+					currentVariable.name += quotedStringGetAndAdvance(remainingString, advance);
 					continue;
 				}
 				currentVariable.name += remainingString[0];
@@ -76,9 +98,9 @@ export function parseStringTemplateGenerator({
 					currentPipe.name += getEscapedCharacter();
 					continue;
 				}
-				if (testVariableEnd() || testPipeStart() || testPipeParameterStart()) continue;
-				if (QUOTED_STRING.test(remainingString)) {
-					currentPipe.name += getQuotedString();
+				if (testVariableEnd() || testPipeParameterStart() || testPipeStart()) continue;
+				if (quotedStringTest(remainingString)) {
+					currentPipe.name += quotedStringGetAndAdvance(remainingString, advance);
 					continue;
 				}
 				currentPipe.name += remainingString[0];
@@ -89,9 +111,9 @@ export function parseStringTemplateGenerator({
 					currentPipeParameter += getEscapedCharacter();
 					continue;
 				}
-				if (testVariableEnd() || testPipeStart() || testPipeParameterStart()) continue;
-				if (QUOTED_STRING.test(remainingString)) {
-					currentPipeParameter += getQuotedString();
+				if (testVariableEnd() || testPipeParameterStart() || testPipeStart()) continue;
+				if (quotedStringInParameterTest(remainingString)) {
+					currentPipeParameter += quotedStringInParameterGetAndAdvance(remainingString, advance);
 					continue;
 				}
 				currentPipeParameter += remainingString[0];
@@ -121,11 +143,6 @@ export function parseStringTemplateGenerator({
 			advance();
 			
 			return escapedCharacter;
-		}
-		function getQuotedString(): string {
-			const quotedStringMatch = <RegExpMatchArray>remainingString.match(QUOTED_STRING);
-			advance(quotedStringMatch[0].length);
-			return quotedStringMatch.slice(2).join('').replace('\\\\', '\\');
 		}
 		
 		function newCurrentVariable({isNull = false} = {}) {
@@ -183,3 +200,10 @@ export function parseStringTemplateGenerator({
 }
 
 export const parseStringTemplate = parseStringTemplateGenerator();
+export function getQuotedStringAndAdvanceForRegex(regex: RegExp) {
+	return (remainingString: string, advance: (length: number) => void) => {
+		const quotedStringMatch = <RegExpMatchArray>remainingString.match(regex);
+		advance(quotedStringMatch[0].length);
+		return quotedStringMatch.slice(2).join('').replace('\\\\', '\\');
+	};
+}

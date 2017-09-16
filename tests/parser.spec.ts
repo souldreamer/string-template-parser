@@ -2,8 +2,36 @@ import { test } from 'ava';
 import { ParsedString, parseStringTemplate, parseStringTemplateGenerator } from '../src/parser';
 
 const parseAngularStringTemplate = parseStringTemplateGenerator({
-	VARIABLE_START: /^(\{\{\s*)/,
+	VARIABLE_START: /^({{\s*)/,
 	VARIABLE_END: /^\s*}}/
+});
+
+const parseI18NPluralizationTemplate = parseStringTemplateGenerator({
+	VARIABLE_START: /^{\s*/,
+	VARIABLE_END: /^\s*}/,
+	PIPE_START: /^\s*,\s*/,
+	PIPE_PARAMETER_START: /^\s*,\s*/,
+	QUOTED_STRING_IN_PARAMETER_TEST: (remainingString => remainingString.startsWith('{')),
+	QUOTED_STRING_IN_PARAMETER_GET_AND_ADVANCE: ((remainingString: string, advance: (length: number) => void) => {
+		let currentPosition = 1;
+		let depth = 1;
+		while (depth > 0 && currentPosition < remainingString.length) {
+			if (remainingString[currentPosition] === '\\') {
+				currentPosition += 2;
+				continue;
+			}
+			if (remainingString[currentPosition] === '{') {
+				depth++;
+			}
+			if (remainingString[currentPosition] === '}') {
+				depth--;
+			}
+			currentPosition++;
+		}
+		const result = remainingString.substr(0, currentPosition);
+		advance(currentPosition);
+		return result;
+	})
 });
 
 function testStringParsing(testName: string, testString: string, expected: ParsedString) {
@@ -16,6 +44,13 @@ function testStringParsing(testName: string, testString: string, expected: Parse
 function testAngularStringParsing(testName: string, testString: string, expected: ParsedString) {
 	test(testName, t => {
 		const testResult = parseAngularStringTemplate(testString);
+		t.deepEqual(testResult, expected);
+	});
+}
+
+function testI18NStringParsing(testName: string, testString: string, expected: ParsedString) {
+	test(testName, t => {
+		const testResult = parseI18NPluralizationTemplate(testString);
 		t.deepEqual(testResult, expected);
 	});
 }
@@ -146,3 +181,31 @@ testAngularStringParsing('angular complex example',
 			{name: 'pipe2', parameters: ['paramA', 'paramB']}]},
 		{name: 'var|2', pipes: [
 			{name: 'pi|pe:test', parameters: ['param:X']}]}]});
+
+testI18NStringParsing('I18N: pluralization',
+	'this is {numPeople, plural, =0 {no one} =1 {someone} other {everyone}}',
+	{literals: ['this is ', ''], variables: [
+		{name: 'numPeople', pipes: [
+			{name: 'plural', parameters: [
+				'=0 {no one} =1 {someone} other {everyone}'
+			]}
+		]}
+	]});
+testI18NStringParsing('I18N: select',
+	'this is a {gender, select, m {man} f {woman}}',
+	{literals: ['this is a ', ''], variables: [
+		{name: 'gender', pipes: [
+			{name: 'select', parameters: [
+				'm {man} f {woman}'
+			]}
+		]}
+	]});
+testI18NStringParsing('I18N: pluralization + select',
+	'{count, plural, =0 {no one} =1 {{gender, select, m {a man} f {a woman}}} other {count {gender, select, m {men} f {women}}}}',
+	{literals: ['', ''], variables: [
+		{name: 'count', pipes: [
+			{name: 'plural', parameters: [
+				'=0 {no one} =1 {{gender, select, m {a man} f {a woman}}} other {count {gender, select, m {men} f {women}}}'
+			]}
+		]}
+	]});
