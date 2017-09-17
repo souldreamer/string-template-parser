@@ -17,11 +17,12 @@ function getParsedVariable(
     pipes: {[pipeName: string]: PipeFunction},
 	getValue: (variableName: string) => any = DEFAULT_GET_VALUE(variables)
 ): string {
+	const variableStartValue = getValue(variable.name);
 	return variable.pipes.reduce((variableValue, pipe) => {
 			return pipes.hasOwnProperty(pipe.name) ?
 				pipes[pipe.name](variableValue, pipe.parameters) :
 				variableValue;
-		}, getValue(variable.name) || '');
+		}, variableStartValue == null ? '' : variableStartValue);
 }
 
 export function evaluateParsedString(

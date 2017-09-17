@@ -7,13 +7,14 @@ const variables: {[variableName: string]: any} = {
 	c: 'value-c',
 	d: {
 		e: 'bla'
-	}
+	},
+	zero: 0
 };
 const pipes: {[pipeName: string]: PipeFunction} = {
 	'!': (variableValue) => `${variableValue}-!`,
 	'postfix': (variableValue, parameters) => `${variableValue}-${parameters.join('-')}`,
 	'prefix': (variableValue, parameters) => `${parameters.join('-')}-${variableValue}`,
-	'upper': (variableValue) => variableValue.toUpperCase()
+	'upper': (variableValue) => variableValue.toString().toUpperCase()
 };
 
 function testStringEvaluation(testName: string, testString: string, expected: string) {
@@ -39,6 +40,7 @@ testStringEvaluation('evaluate complex example',
 	'x @-#-value-a-!-1-2 y t-VALUE-B-u z');
 testStringEvaluation('evaluate string with variable & inexistent pipe', '${a|foo}', 'value-a');
 testStringEvaluation('evaluate string with sub-variable', '${d.e}', 'bla');
+testStringEvaluation('evaluate 0-value', '${zero|!}', '0-!');
 
 test('evaluateParsedString: no literals in literal array', t => {
 	const testResult = evaluateParsedString({literals: [], variables: []}, {}, {});
