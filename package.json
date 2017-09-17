@@ -1,17 +1,19 @@
 {
 	"name": "string-template-parser",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "Parsing & evaluating utilities for string templates",
 	"repository": "https://github.com/souldreamer/string-template-parser.git",
-	"main": "./dist/index.js",
+	"main": "./dist/string-template-parser.js",
 	"author": "Ionut Costica <ionut.costica@gmail.com>",
 	"license": "MIT",
 	"scripts": {
-		"prepublish": "tsc",
+		"prepare": "webpack --debug --clean; webpack -p",
 		"test": "tsc && nyc ava"
 	},
 	"types": "dist/index.d.ts",
+	"keywords": ["template string", "string parser", "template string parser", "angular string parser", "string variables", "pipes"],
 	"devDependencies": {
+		"@types/node": "^8.0.28",
 		"ava": "^0.22.0",
 		"del": "^3.0.0",
 		"delete-empty": "^1.0.1",
@@ -22,8 +24,7 @@
 		"webpack": "^3.6.0",
 		"webpack-node-externals": "^1.6.0",
 		"webpack-progress-plugin": "^1.1.0",
-		"yargs": "^8.0.2",
-		"@types/node": "^8.0.28"
+		"yargs": "^8.0.2"
 	},
 	"dependencies": {
 	},

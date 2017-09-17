@@ -23,7 +23,7 @@ if (yargs.argv.p) {
 
 var config = {
 	entry: [
-		path.join(__dirname, '/src/index.ts')
+		path.join(__dirname, '/src/index')
 	],
 	devtool: 'source-map',
 	output: {
@@ -35,21 +35,14 @@ var config = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.ts$/, loader: 'ts', exclude: [/node_modules/, /dist/, /tests/] }
+			{ test: /\.ts$/, loader: 'ts-loader', exclude: [/node_modules/, /dist/, /tests/] }
 		]
 	},
 	resolve: {
-		root: path.resolve('./src'),
-		extensions: [ '', '.ts', '!.spec.ts' ]
+		extensions: ['.ts', '!.spec.ts']
 	},
 	plugins: plugins,
-	externals: [nodeExternals()],
-
-	ts: {
-		compilerOptions: {
-			declaration: true
-		}
-	}
+	externals: [nodeExternals()]
 };
 
 module.exports = config;
@@ -79,8 +72,8 @@ function webpackStartEndHandler(percentage, message) {
 
 var dtsBundleOptions = {
 	name: libraryName,
-	main: 'dist/src/index.d.ts',
-	baseDir: 'dist/src',
+	main: 'dist/dist/index.d.ts',
+	baseDir: 'dist/dist',
 	out: '../index.d.ts',
 	externals: false,
 	referenceExternals: false,
@@ -92,5 +85,6 @@ var dtsBundleOptions = {
 	verbose: false,
 	emitOnIncludedFileNotFound: false,
 	emitOnNoIncludedFileNotFound: false,
-	outputAsModuleFolder: false
+	outputAsModuleFolder: false,
+	headerPath: ''
 };
