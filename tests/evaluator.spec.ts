@@ -1,10 +1,13 @@
 import { test } from 'ava';
 import { PipeFunction, evaluateStringTemplate, evaluateParsedString } from '../src/evaluator';
 
-const variables: {[variableName: string]: string} = {
+const variables: {[variableName: string]: any} = {
 	a: 'value-a',
 	b: 'value-b',
-	c: 'value-c'
+	c: 'value-c',
+	d: {
+		e: 'bla'
+	}
 };
 const pipes: {[pipeName: string]: PipeFunction} = {
 	'!': (variableValue) => `${variableValue}-!`,
@@ -35,6 +38,7 @@ testStringEvaluation('evaluate complex example',
 	'x ${a|!|prefix:@:#|postfix:1:2} y ${b|upper|postfix:u|prefix:t} z',
 	'x @-#-value-a-!-1-2 y t-VALUE-B-u z');
 testStringEvaluation('evaluate string with variable & inexistent pipe', '${a|foo}', 'value-a');
+testStringEvaluation('evaluate string with sub-variable', '${d.e}', 'bla');
 
 test('evaluateParsedString: no literals in literal array', t => {
 	const testResult = evaluateParsedString({literals: [], variables: []}, {}, {});

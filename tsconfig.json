@@ -1,26 +1,16 @@
 {
 	"compilerOptions": {
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"noEmitOnError": true,
-		"noImplicitAny": true,
-		"strictNullChecks": true,
-		"inlineSourceMap": true,
-		"rootDir": ".",
 		"target": "es5",
-		"declaration": false,
-		"lib": ["es6", "es5", "dom"],
-		"typeRoots": [
-			"./node_modules/@types"
-		],
-		"types": [
-			"node"
-		]
+		"module": "umd",
+		"outDir": "dist",
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"declaration": true,
+		"declarationDir": "dist",
+		"lib": [ "es5", "es6", "dom" ]
 	},
-	"exclude": [
-		"node_modules/**/*",
-		"dist/**/*"
+	"files": [
+		"src/index.ts"
 	]
 }
