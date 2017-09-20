@@ -14,12 +14,7 @@ var plugins = [
 var outputFile;
 var cleanInstall = yargs.argv.clean && true || false;
 
-if (yargs.argv.p) {
-	plugins.push(new webpack.optimize.UglifyJsPlugin({ minimize: true }));
-	outputFile = libraryName + '.min.js';
-} else {
-	outputFile = libraryName + '.js';
-}
+outputFile = 'index.js';
 
 var config = {
 	entry: [
