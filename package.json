@@ -1,6 +1,6 @@
 {
 	"name": "string-template-parser",
-	"version": "1.2.3",
+	"version": "1.2.4",
 	"description": "Parsing & evaluating utilities for string templates",
 	"repository": "https://github.com/souldreamer/string-template-parser.git",
 	"main": "./dist/string-template-parser.js",
@@ -11,7 +11,14 @@
 		"test": "tsc && nyc ava"
 	},
 	"types": "dist/index.d.ts",
-	"keywords": ["template string", "string parser", "template string parser", "angular string parser", "string variables", "pipes"],
+	"keywords": [
+		"template string",
+		"string parser",
+		"template string parser",
+		"angular string parser",
+		"string variables",
+		"pipes"
+	],
 	"devDependencies": {
 		"@types/node": "^8.0.28",
 		"ava": "^0.22.0",
@@ -27,6 +34,15 @@
 		"yargs": "^8.0.2"
 	},
 	"dependencies": {
+		"@types/node": "^8.0.28",
+		"ava": "^0.22.0",
+		"del": "^3.0.0",
+		"delete-empty": "^1.0.1",
+		"dts-bundle": "^0.7.3",
+		"nyc": "^11.2.1",
+		"webpack": "^3.6.0",
+		"webpack-node-externals": "^1.6.0",
+		"yargs": "^9.0.1"
 	},
 	"ava": {
 		"files": [

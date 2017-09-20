@@ -62,7 +62,7 @@ export function parseStringTemplateGenerator({
 		let existsCurrentPipe = false;
 		let existsCurrentPipeParameter = false;
 
-		while (remainingString.length > 0) {
+		while (remainingString && remainingString.length > 0) {
 			switch (parseState) {
 			case ParseState.Literal:
 				if (ESCAPE.test(remainingString)) {
