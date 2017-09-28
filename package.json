@@ -28,21 +28,12 @@
 		"nyc": "^11.2.1",
 		"ts-loader": "^2.3.7",
 		"typescript": "^2.5.2",
-		"webpack": "^3.6.0",
+		"webpack": "^3.0.0",
 		"webpack-node-externals": "^1.6.0",
 		"webpack-progress-plugin": "^1.1.0",
 		"yargs": "^8.0.2"
 	},
 	"dependencies": {
-		"@types/node": "^8.0.28",
-		"ava": "^0.22.0",
-		"del": "^3.0.0",
-		"delete-empty": "^1.0.1",
-		"dts-bundle": "^0.7.3",
-		"nyc": "^11.2.1",
-		"webpack": "^3.6.0",
-		"webpack-node-externals": "^1.6.0",
-		"yargs": "^9.0.1"
 	},
 	"ava": {
 		"files": [
