@@ -1,6 +1,6 @@
 {
 	"name": "string-template-parser",
-	"version": "1.2.5",
+	"version": "1.2.6",
 	"description": "Parsing & evaluating utilities for string templates",
 	"repository": "https://github.com/souldreamer/string-template-parser.git",
 	"main": "dist/index.js",
@@ -33,8 +33,7 @@
 		"webpack-progress-plugin": "^1.1.0",
 		"yargs": "^8.0.2"
 	},
-	"dependencies": {
-	},
+	"dependencies": {},
 	"ava": {
 		"files": [
 			"tests/*.js"
